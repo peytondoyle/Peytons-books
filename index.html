@@ -10,8 +10,7 @@
     --bg1:#e8edff; --bg2:#fde7f3;
     --chip:#eef2ff; --chip-ink:#374151;
     --pill:#1e3a8a; --pill-ink:#fff;
-    --accent:#6d28d9; --radius:22px; --blur:14px;
-    --card:rgba(255,255,255,0.55);
+    --radius:22px; --blur:14px; --card:rgba(255,255,255,0.55);
   }
   *{box-sizing:border-box}
   body{
@@ -57,11 +56,22 @@
     border-radius:var(--radius);
     box-shadow: 0 8px 30px rgba(14,30,68,0.10);
     border:1px solid rgba(255,255,255,0.55);
-    padding:16px 16px 14px;
+    padding:14px 16px 12px;
     display:flex; flex-direction:column; gap:8px;
   }
-  .title{ font-weight:800; letter-spacing:-0.02em; font-size:18px }
+
+  /* Header row prevents overlap */
+  .head{ display:flex; align-items:flex-start; gap:10px }
+  .head .titleWrap{ min-width:0; flex:1 1 auto }
+  .title{ font-weight:800; letter-spacing:-0.02em; font-size:18px; white-space:normal; }
   .author{ color:var(--muted); font-weight:600; font-size:13px }
+  .rate{
+    flex:0 0 auto; align-self:flex-start;
+    background:var(--pill); color:var(--pill-ink);
+    border-radius:999px; padding:6px 10px; font-size:12px; font-weight:700;
+    box-shadow:0 3px 10px rgba(30,58,138,0.25);
+  }
+
   .genre{ display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 2px}
   .chip{
     background:var(--chip); color:var(--chip-ink);
@@ -74,13 +84,6 @@
 
   .vibes{ display:flex; gap:6px; flex-wrap:wrap }
   .vibe{ background:#ffffffbf; border:1px solid rgba(0,0,0,0.06); padding:4px 8px; border-radius:999px; font-size:12px }
-
-  .rate{
-    position:absolute; top:12px; right:12px;
-    background:var(--pill); color:var(--pill-ink);
-    border-radius:999px; padding:6px 10px; font-size:12px; font-weight:700;
-    box-shadow:0 3px 10px rgba(30,58,138,0.25);
-  }
 
   .twWrap{ display:flex; align-items:center; gap:6px }
   .twBtn{
@@ -96,7 +99,7 @@
   }
   .twBox.show{ display:block }
 
-  .footer{ display:flex; justify-content:flex-end; align-items:center; margin-top:8px }
+  .footer{ display:flex; justify-content:flex-end; align-items:center; margin-top:6px }
   .vote{
     border:none; background:transparent; cursor:pointer;
     font-size:20px; line-height:1; padding:6px 10px; border-radius:999px;
@@ -186,11 +189,25 @@ const books = [
   {t:"Girl in a Rabbit Hole",a:"RJ Law",g:["Thriller","Psychological"],r:"Woman searches for truth after her husband’s disappearance; cultish elements.",tw:"Domestic abuse, cults, violence",v:["🕳️ Twisty","🌑 Dark"],gr:3.56},
   {t:"The Gone World",a:"Tom Sweterlitsch",g:["Sci-Fi","Horror"],r:"NCIS investigator uses time travel to solve a crime & avert apocalypse.",tw:"Gore, child death, suicide",v:["🎬 Cinematic","🖤 Bleak"],gr:3.92},
   {t:"House of Leaves",a:"Mark Z. Danielewski",g:["Horror","Experimental"],r:"A house is bigger on the inside than the outside; layered, labyrinthine texts.",tw:"Madness, body horror",v:["📓 Cult classic","🌀 Book-as-maze"],gr:4.09},
-  {t:"Tender Is the Flesh",a:"Agustina Bazterrica",g:["Horror","Dystopian"],r:"Future where cannibalism is legalized after livestock collapse.",tw:"Cannibalism, animal cruelty, graphic violence",v:["🔪 Disturbing","🧪 Satirical"],gr:3.78}
+  {t:"Tender Is the Flesh",a:"Agustina Bazterrica",g:["Horror","Dystopian"],r:"Future where cannibalism is legalized after livestock collapse.",tw:"Cannibalism, animal cruelty, graphic violence",v:["🔪 Disturbing","🧪 Satirical"],gr:3.78},
+  {t:"The Butcher’s Wife",a:"RJ Law",g:["Thriller"],r:"A woman is tangled in her husband’s sinister secrets.",tw:"Domestic abuse, violence",v:["🩸 Gritty","📼 Pulpy"],gr:3.08},
+  {t:"Strange Houses",a:"Uketsu",g:["Horror","Japanese","Mystery"],r:"Linked stories exploring eerie houses across Japan.",tw:"Gore, psychological horror",v:["🏚️ Atmospheric","👻 Creepy"],gr:3.70},
+  {t:"Whalefall",a:"Daniel Kraus",g:["Thriller","Survival"],r:"A diver is swallowed by a whale and must escape before oxygen runs out.",tw:"Claustrophobia, animal death, suicide",v:["⏱️ Ticking clock","🔬 Biological detail"],gr:3.69},
+  {t:"Harold",a:"Steven Wright",g:["Literary"],r:"One boy’s stream-of-consciousness during a 1960s school day.",tw:"Childhood neglect, dark humor",v:["🤪 Deadpan","🌀 Weird"],gr:3.46},
+  {t:"Automatic Noodle",a:"Annalee Newitz",g:["Sci-Fi","Satire"],r:"Bots in a ghost kitchen investigate review spam to find the culprit.",tw:"Mild violence, tech cynicism",v:["🤖 Whimsical","🧩 Clever"],gr:3.93},
+  {t:"Excavations",a:"Hannah Michell",g:["Mystery","Literary"],r:"A mother investigates after her husband goes missing in a building collapse.",tw:"Political corruption, family trauma",v:["🧱 Slow burn","🪜 Layered"],gr:3.80},
+  {t:"Bellweather Rhapsody",a:"Kate Racculia",g:["Mystery","Cozy"],r:"Snowed-in high school music festival + a murder at a hotel.",tw:"Suicide, murder",v:["🎶 Quirky","💃 Campy"],gr:3.80},
+  {t:"The Glutton",a:"A.K. Blakemore",g:["Historical","Literary"],r:"A nun cares for a man with uncontrollable hunger in 18th-century France.",tw:"Eating disorders, abuse, grotesque detail",v:["🕯️ Gothic","🌫️ Unsettling"],gr:3.74},
+  {t:"All That’s Left in the World",a:"Erik J. Brown",g:["YA","Queer Romance","Post-Apoc"],r:"Two boys surviving a pandemic form a bond while navigating danger.",tw:"Pandemic trauma, death, homophobia",v:["🌱 Tender","💞 Hopeful"],gr:4.22},
 ];
 
 const KEY = "bookVotes.v1";
 let votes = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
+const urlVotes = new URLSearchParams(location.search).get("votes");
+if (urlVotes) {
+  urlVotes.split("|").map(decodeURIComponent).forEach(t => votes.add(t));
+  localStorage.setItem(KEY, JSON.stringify([...votes]));
+}
 
 const grid = document.getElementById('grid');
 const votesTotalEl = document.getElementById('votesTotal');
@@ -205,15 +222,17 @@ function cardHTML(b){
   const id = b.t.replace(/\W+/g,'-');
   return `
   <article class="card" data-title="${b.t}" data-genres="${b.g.join('|')}">
-    <div class="rate">★ ${b.gr.toFixed(2)}</div>
-    <div class="title">${b.t}</div>
-    <div class="author">${b.a}</div>
+    <div class="head">
+      <div class="titleWrap">
+        <div class="title">${b.t}</div>
+        <div class="author">${b.a}</div>
+      </div>
+      <div class="rate">★ ${b.gr.toFixed(2)}</div>
+    </div>
     <div class="genre">${b.g.map(chip).join('')}</div>
     <div class="recap">${b.r}</div>
     <div class="twWrap">
-      <button class="twBtn" onclick="toggleTW('${id}')">
-        TW <span class="chev" id="${id}-chev">▾</span>
-      </button>
+      <button class="twBtn" onclick="toggleTW('${id}')">TW <span class="chev" id="${id}-chev">▾</span></button>
       <span class="hint">Tap to view warnings</span>
     </div>
     <div class="twBox" id="${id}-box">${b.tw}</div>
@@ -232,13 +251,41 @@ function toggleTW(id){
   const on=box.classList.toggle('show'); chev.style.transform=on?'rotate(180deg)':'rotate(0deg)';
 }
 
+/* Sort & Filter */
+document.getElementById('sort').addEventListener('change', e=>{
+  const v = e.target.value;
+  let list = [...books];
+  if(v==='votesDesc') list.sort((a,b)=>(votes.has(b.t)-votes.has(a.t)) || b.gr-a.gr);
+  if(v==='ratingDesc') list.sort((a,b)=>b.gr-a.gr);
+  if(v==='ratingAsc')  list.sort((a,b)=>a.gr-b.gr);
+  if(v==='titleAsc')   list.sort((a,b)=>a.t.localeCompare(b.t));
+  render(list);
+  applyFilter(document.getElementById('filter').value);
+});
+document.getElementById('filter').addEventListener('change', e=>{
+  applyFilter(e.target.value);
+});
+function applyFilter(val){
+  const cards = [...document.querySelectorAll('.card')];
+  cards.forEach(c=>{
+    if(val==='all') return c.style.display='';
+    const genres = c.getAttribute('data-genres').toLowerCase();
+    c.style.display = genres.includes(val.toLowerCase()) ? '' : 'none';
+  });
+}
+
+/* Voting */
 function toggleVote(title,btn){
   if(votes.has(title)){votes.delete(title);btn.dataset.on="false";btn.textContent="☆";}
   else {votes.add(title);btn.dataset.on="true";btn.textContent="⭐";}
   localStorage.setItem(KEY,JSON.stringify([...votes])); updateVotesUI();
 }
-function updateVotesUI(){ votesTotalEl.textContent=votes.size; if(sheet.classList.contains('open')) buildPickList(); }
+function updateVotesUI(){
+  votesTotalEl.textContent=votes.size;
+  if(sheet.classList.contains('open')) buildPickList();
+}
 
+/* Sheet controls */
 document.getElementById('openVotes').addEventListener('click',()=>{ buildPickList(); sheet.classList.add('open'); });
 document.getElementById('closeSheet').addEventListener('click',()=>{ sheet.classList.remove('open'); });
 sheet.addEventListener('click',e=>{ if(e.target===sheet) sheet.classList.remove('open'); });
