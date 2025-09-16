@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Book Recs – Liquid Glass Cards</title>
+<style>
+  :root{
+    --ink:#0b1220; --muted:#5b6475;
+    --bg1:#e8edff; --bg2:#fde7f3;
+    --chip:#eef2ff; --chip-ink:#374151;
+    --pill:#1e3a8a; --pill-ink:#fff;
+    --accent:#6d28d9; --radius:22px; --blur:14px;
+    --card:rgba(255,255,255,0.55);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(1200px 700px at 10% -10%, var(--bg1), transparent 60%),
+      radial-gradient(1200px 700px at 100% 20%, var(--bg2), transparent 60%),
+      linear-gradient(180deg,#f7f8ff, #fdf7fb 50%, #f6f7ff);
+    min-height:100dvh;
+  }
+  header{ padding:28px 20px 8px; text-align:center }
+  h1{ margin:0 0 6px; font-size:clamp(24px,3vw,34px); letter-spacing:-0.02em }
+  .sub{ color:var(--muted); font-size:13px }
+
+  .controls{
+    position:sticky; top:0; z-index:20;
+    backdrop-filter:saturate(160%) blur(10px);
+    -webkit-backdrop-filter:saturate(160%) blur(10px);
+    background:linear-gradient(180deg, rgba(255,255,255,0.68), rgba(255,255,255,0.38));
+    border-bottom:1px solid rgba(0,0,0,0.06);
+    padding:8px 16px;
+  }
+  .bar{ max-width:1200px; margin:0 auto; display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+  select{
+    border:1px solid rgba(0,0,0,0.08);
+    background:#ffffffaa; backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    border-radius:14px; padding:8px 10px; font-size:14px; color:var(--ink);
+  }
+  .spacer{ flex:1 }
+
+  .grid{
+    max-width:1200px; margin:16px auto 80px; padding:0 16px;
+    display:grid; gap:16px;
+    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+  }
+
+  .card{
+    background:var(--card);
+    backdrop-filter: blur(var(--blur)) saturate(170%);
+    -webkit-backdrop-filter: blur(var(--blur)) saturate(170%);
+    border-radius:var(--radius);
+    box-shadow: 0 8px 30px rgba(14,30,68,0.10);
+    border:1px solid rgba(255,255,255,0.55);
+    padding:16px 16px 14px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .title{ font-weight:800; letter-spacing:-0.02em; font-size:18px }
+  .author{ color:var(--muted); font-weight:600; font-size:13px }
+  .genre{ display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 2px}
+  .chip{
+    background:var(--chip); color:var(--chip-ink);
+    border:1px solid rgba(0,0,0,0.06);
+    padding:4px 8px; border-radius:999px; font-size:12px; font-weight:600;
+  }
+  .recap{ font-size:14px; line-height:1.45 }
+  .muted{ color:var(--muted) }
+  .hint{ color:var(--muted); font-size:12px; margin-top:-2px }
+
+  .vibes{ display:flex; gap:6px; flex-wrap:wrap }
+  .vibe{ background:#ffffffbf; border:1px solid rgba(0,0,0,0.06); padding:4px 8px; border-radius:999px; font-size:12px }
+
+  .rate{
+    position:absolute; top:12px; right:12px;
+    background:var(--pill); color:var(--pill-ink);
+    border-radius:999px; padding:6px 10px; font-size:12px; font-weight:700;
+    box-shadow:0 3px 10px rgba(30,58,138,0.25);
+  }
+
+  .twWrap{ display:flex; align-items:center; gap:6px }
+  .twBtn{
+    appearance:none; border:none; background:#fff; color:#1e3a8a; font-weight:800;
+    padding:4px 8px; border-radius:999px; font-size:12px; cursor:pointer;
+    border:1px solid rgba(0,0,0,0.06);
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .chev{ transition:transform .12s ease }
+  .twBox{
+    display:none; margin-top:6px; font-size:12px; color:var(--muted);
+    background:#ffffff85; border:1px solid rgba(0,0,0,0.06); border-radius:12px; padding:8px;
+  }
+  .twBox.show{ display:block }
+
+  .footer{ display:flex; justify-content:flex-end; align-items:center; margin-top:8px }
+  .vote{
+    border:none; background:transparent; cursor:pointer;
+    font-size:20px; line-height:1; padding:6px 10px; border-radius:999px;
+    transition:transform .12s ease;
+  }
+  .vote:hover{ transform:scale(1.06) }
+  .vote[data-on="false"]{ color:#6b7280 }
+  .vote[data-on="true"]{
+    color:#fff; background:linear-gradient(135deg, #7c3aed, #0ea5e9);
+    box-shadow:0 6px 18px rgba(124,58,237,0.35);
+  }
+
+  .fab{
+    position:fixed; right:18px; bottom:18px; z-index:40;
+    background:#111827; color:#fff; border:none; cursor:pointer;
+    padding:12px 16px; border-radius:999px; font-weight:800; font-size:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  .sheet{ position:fixed; inset:0; display:none; place-items:end center; z-index:50; background:rgba(0,0,0,.22); }
+  .sheet.open{ display:grid }
+  .panel{
+    width:min(680px,94vw); margin:18px; padding:16px;
+    background:var(--card); backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    border:1px solid rgba(255,255,255,.6);
+    border-radius:20px; box-shadow:0 30px 60px rgba(0,0,0,.35);
+  }
+  .panel h3{ margin:0 0 8px; font-size:18px }
+  .list{ font-size:14px; margin:8px 0 14px; padding-left:18px }
+  .row{ display:flex; gap:8px; justify-content:flex-end }
+  .ghost{
+    background:#ffffffaa; border:1px solid rgba(0,0,0,.08);
+    padding:10px 12px; border-radius:12px; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📚 Book Recs (Liquid Glass Edition)</h1>
+  <div class="sub">Click the ⭐ in the footer of any card to vote • Tap TW to view warnings</div>
+</header>
+
+<div class="controls">
+  <div class="bar">
+    <label class="muted">Filter:</label>
+    <select id="filter">
+      <option value="all">All genres</option>
+      <option>Sci-Fi</option><option>Horror</option><option>Thriller</option>
+      <option>Literary</option><option>Mystery</option><option>YA</option>
+      <option>Satire</option><option>Historical</option><option>Japanese</option>
+      <option>Queer Romance</option><option>Cozy</option><option>Survival</option>
+      <option>Post-Apoc</option><option>Experimental</option>
+    </select>
+    <div class="spacer"></div>
+    <label class="muted">Sort:</label>
+    <select id="sort">
+      <option value="default">Original order</option>
+      <option value="votesDesc">Votes ↓</option>
+      <option value="ratingDesc">Rating ↓</option>
+      <option value="ratingAsc">Rating ↑</option>
+      <option value="titleAsc">Title A–Z</option>
+    </select>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<button class="fab" id="openVotes">⭐ Votes: <span id="votesTotal">0</span></button>
+
+<div class="sheet" id="sheet">
+  <div class="panel">
+    <h3>Your Picks</h3>
+    <ol class="list" id="pickList"></ol>
+    <div class="row">
+      <button class="ghost" id="copyPicks">Copy Share Link</button>
+      <button class="ghost" id="clearPicks">Clear Votes</button>
+      <button class="ghost" id="closeSheet">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const books = [
+  {t:"The Passengers",a:"John Marrs",g:["Thriller","Sci-Fi"],r:"Eight self-driving car passengers are hacked; the public must vote who survives.",tw:"Death, terrorism, surveillance",v:["⚡ Fast","🖥️ Black-Mirror"],gr:4.06},
+  {t:"The Three-Body Problem",a:"Cixin Liu",g:["Sci-Fi","Literary"],r:"First contact with an alien civilization via a VR game and secret project.",tw:"Violence, genocide, existential dread",v:["🧠 Cerebral","🌀 Mind-bender"],gr:4.08},
+  {t:"Girl in a Rabbit Hole",a:"RJ Law",g:["Thriller","Psychological"],r:"Woman searches for truth after her husband’s disappearance; cultish elements.",tw:"Domestic abuse, cults, violence",v:["🕳️ Twisty","🌑 Dark"],gr:3.56},
+  {t:"The Gone World",a:"Tom Sweterlitsch",g:["Sci-Fi","Horror"],r:"NCIS investigator uses time travel to solve a crime & avert apocalypse.",tw:"Gore, child death, suicide",v:["🎬 Cinematic","🖤 Bleak"],gr:3.92},
+  {t:"House of Leaves",a:"Mark Z. Danielewski",g:["Horror","Experimental"],r:"A house is bigger on the inside than the outside; layered, labyrinthine texts.",tw:"Madness, body horror",v:["📓 Cult classic","🌀 Book-as-maze"],gr:4.09},
+  {t:"Tender Is the Flesh",a:"Agustina Bazterrica",g:["Horror","Dystopian"],r:"Future where cannibalism is legalized after livestock collapse.",tw:"Cannibalism, animal cruelty, graphic violence",v:["🔪 Disturbing","🧪 Satirical"],gr:3.78}
+];
+
+const KEY = "bookVotes.v1";
+let votes = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
+
+const grid = document.getElementById('grid');
+const votesTotalEl = document.getElementById('votesTotal');
+const sheet = document.getElementById('sheet');
+const pickList = document.getElementById('pickList');
+
+function chip(s){ return `<span class="chip">${s}</span>` }
+function vibe(s){ return `<span class="vibe">${s}</span>` }
+
+function cardHTML(b){
+  const voted = votes.has(b.t);
+  const id = b.t.replace(/\W+/g,'-');
+  return `
+  <article class="card" data-title="${b.t}" data-genres="${b.g.join('|')}">
+    <div class="rate">★ ${b.gr.toFixed(2)}</div>
+    <div class="title">${b.t}</div>
+    <div class="author">${b.a}</div>
+    <div class="genre">${b.g.map(chip).join('')}</div>
+    <div class="recap">${b.r}</div>
+    <div class="twWrap">
+      <button class="twBtn" onclick="toggleTW('${id}')">
+        TW <span class="chev" id="${id}-chev">▾</span>
+      </button>
+      <span class="hint">Tap to view warnings</span>
+    </div>
+    <div class="twBox" id="${id}-box">${b.tw}</div>
+    <div class="vibes">${b.v.map(vibe).join('')}</div>
+    <div class="footer">
+      <button class="vote" data-on="${voted}" onclick="toggleVote('${b.t}', this)">${voted ? "⭐" : "☆"}</button>
+    </div>
+  </article>`;
+}
+
+function render(list){ grid.innerHTML = list.map(cardHTML).join(''); }
+render(books); updateVotesUI();
+
+function toggleTW(id){
+  const box=document.getElementById(id+'-box'); const chev=document.getElementById(id+'-chev');
+  const on=box.classList.toggle('show'); chev.style.transform=on?'rotate(180deg)':'rotate(0deg)';
+}
+
+function toggleVote(title,btn){
+  if(votes.has(title)){votes.delete(title);btn.dataset.on="false";btn.textContent="☆";}
+  else {votes.add(title);btn.dataset.on="true";btn.textContent="⭐";}
+  localStorage.setItem(KEY,JSON.stringify([...votes])); updateVotesUI();
+}
+function updateVotesUI(){ votesTotalEl.textContent=votes.size; if(sheet.classList.contains('open')) buildPickList(); }
+
+document.getElementById('openVotes').addEventListener('click',()=>{ buildPickList(); sheet.classList.add('open'); });
+document.getElementById('closeSheet').addEventListener('click',()=>{ sheet.classList.remove('open'); });
+sheet.addEventListener('click',e=>{ if(e.target===sheet) sheet.classList.remove('open'); });
+
+function buildPickList(){
+  const picked=books.filter(b=>votes.has(b.t));
+  pickList.innerHTML=picked.length?picked.map(b=>`<li>${b.t} — <span class="muted">${b.a}</span></li>`).join(''):`<li class="muted">(no picks yet)</li>`;
+}
+
+document.getElementById('copyPicks').addEventListener('click',()=>{
+  const picked=[...votes];
+  const list=picked.length?picked.map((t,i)=>`${i+1}. ${t}`).join("\n"):"(no picks yet)";
+  const qs=new URLSearchParams({votes:picked.map(encodeURIComponent).join("|")}).toString();
+  const link=`${location.origin}${location.pathname}?${qs}`;
+  const payload=`My picks:\n${list}\n\nOpen with votes loaded:\n${link}`;
+  navigator.clipboard.writeText(payload).then(()=>alert("Copied your picks + link to clipboard!"));
+});
+document.getElementById('clearPicks').addEventListener('click',()=>{votes=new Set();localStorage.setItem(KEY,"[]");updateVotesUI();render(books);});
+</script>
+</body>
+</html>
